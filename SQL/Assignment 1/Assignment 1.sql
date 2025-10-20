@@ -1,87 +1,89 @@
-CREATE DATABASE Testingsystem ;
-USE Testingsystem;
+CREATE DATABASE testingsystem1;
+USE testingsystem1;
 
 CREATE TABLE department (
-	department_id 		INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    department_name 	VARCHAR(50)
+	DepartmentID 		SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    DepartmentName 		VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE position (
-	position_id     	INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    position_name 		ENUM('Dev', 'Test', 'Scrum Master', 'PM')
+	PositionID    		SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    PositionName 		ENUM('Dev', 'Test', 'Scrum Master', 'PM') NOT NULL
 );
 
 CREATE TABLE account (
-	account_id 			INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    email 				VARCHAR(50), 
-	username			VARCHAR(50),
-    fullname 			VARCHAR(50),
-    department_id 		INT UNSIGNED,
-    FOREIGN KEY (department_id) REFERENCES department (department_id),
-    position_id 		INT UNSIGNED,
-    FOREIGN KEY (position_id) REFERENCES position (position_id),
-    create_date 		DATE
+	AccountID 			SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    Email 				VARCHAR(50) NOT NULL UNIQUE, 
+	Username			VARCHAR(50) NOT NULL,
+    Fullname 			VARCHAR(50) NOT NULL,
+    DepartmentID 		SMALLINT UNSIGNED NOT NULL,
+    FOREIGN KEY (DepartmentID) REFERENCES Department (DepartmentID),
+    PositionID  		SMALLINT UNSIGNED NOT NULL,
+    FOREIGN KEY (PositionID ) REFERENCES Position (PositionID ),
+    CreateDate 			DATETIME DEFAULT NOW()
 );
 
 CREATE TABLE `group` (
-	group_id 			INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    group_name 			VARCHAR(50),
-    creator_id			INT UNSIGNED,
-    create_date 		DATE
+	GroupID 			SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    GroupName 			VARCHAR(50) NOT NULL UNIQUE,
+    CreatorID			SMALLINT UNSIGNED NOT NULL,
+    CreateDate 			DATETIME DEFAULT NOW()
 );
 
 CREATE TABLE group_account (
-	group_id 			INT UNSIGNED PRIMARY KEY,
-    FOREIGN KEY (group_id) REFERENCES `group` ( group_id),
-    account_id 			INT UNSIGNED,
-    FOREIGN KEY (account_id) REFERENCES account (account_id),
-    join_date			DATE 
+	GroupID					SMALLINT UNSIGNED NOT NULL,
+    AccountID				SMALLINT UNSIGNED NOT NULL,
+    JoinDate				DATETIME DEFAULT NOW(),
+    PRIMARY KEY (GroupID,AccountID),
+    FOREIGN KEY(GroupID) REFERENCES `Group`(GroupID)
 );
 
-CREATE TABLE type_question (
-	type_id 			INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    type_name 			ENUM ('Essay', 'Mutiple-Choice')
+CREATE TABLE TypeQuestion (
+	TypeID 				SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    TypeName 			ENUM ('Essay', 'Mutiple-Choice') NOT NULL UNIQUE
 );
 
-CREATE TABLE category_question (
-	category_id 		INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    category_name 		VARCHAR(50)
+CREATE TABLE CategoryQuestion (
+	CategoryID 			SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    CategoryName 		NVARCHAR(50) NOT NULL UNIQUE
 );
 
-CREATE TABLE question (
-	question_id 		INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    content 			VARCHAR(500),
-    category_id 		INT UNSIGNED,
-    FOREIGN KEY (category_id) REFERENCES category_question (category_id),
-    type_id 		INT UNSIGNED,
-    FOREIGN KEY (type_id) REFERENCES type_question (type_id),
-    creator_id 			INT UNSIGNED,
-    create_date 		DATE
+CREATE TABLE Question (
+	QuestionID 			SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    Content 			VARCHAR(500) NOT NULL,
+    CategoryID	 		SMALLINT UNSIGNED,
+    FOREIGN KEY (CategoryID) REFERENCES CategoryQuestion (CategoryID),
+    TypeID 				SMALLINT UNSIGNED NOT NULL,
+    FOREIGN KEY (TypeID) REFERENCES TypeQuestion (TypeID),
+    CreatorID			SMALLINT UNSIGNED NOT NULL,
+    CreateDate 			DATETIME DEFAULT NOW()
 );
 
-CREATE TABLE answer (
-	answer_id 			INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    content 			VARCHAR(500),
-    question_id 		INT UNSIGNED,
-    FOREIGN KEY (question_id) REFERENCES question (question_id),
-    is_correct 			ENUM ('true', 'false')
+CREATE TABLE Answer (
+	AnswerID 			SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    Content 			VARCHAR(100) NOT NULL,
+    QuestionID 			SMALLINT UNSIGNED NOT NULL,
+    FOREIGN KEY (QuestionID) REFERENCES Question (QuestionID),
+    isCorrect 			BIT DEFAULT 1
 );
 
-CREATE TABLE exam (
-	exam_id 			INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    code 				INT UNSIGNED,
-    title 				VARCHAR(100),
-    category_id			INT UNSIGNED,
-    duration 			VARCHAR(10),
-    creator_id			INT UNSIGNED,
-    create_date 		DATE
+CREATE TABLE Exam (
+	ExamID 				SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    Code 				CHAR(10) NOT NULL,
+    Title 				VARCHAR(100) NOT NULL,
+    CategoryID			SMALLINT UNSIGNED NOT NULL,
+    Duration 			VARCHAR(10) NOT NULL,
+    CreatorID			SMALLINT UNSIGNED NOT NULL,
+    CreateDate 			DATETIME DEFAULT NOW(),
+	FOREIGN KEY (CategoryID) REFERENCES CategoryQuestion (CategoryID) ,
+    FOREIGN KEY (CreatorID) REFERENCES Account (AccountId)
 );
 
-CREATE TABLE exam_question (
-	exam_id 			INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    FOREIGN KEY (exam_id) REFERENCES exam (exam_id),
-    question_id 		INT UNSIGNED,
-    FOREIGN KEY (question_id) REFERENCES question (question_id)
+CREATE TABLE ExamQuestion (
+	ExamID 				SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    FOREIGN KEY (ExamID) REFERENCES Exam (ExamID),
+    QuestionID 			SMALLINT UNSIGNED,
+    FOREIGN KEY (QuestionID) REFERENCES Question (QuestionID)
 );
 
 
